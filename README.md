@@ -31,63 +31,80 @@
 <p>MessageService</p>
 </td>
 <td width="141">
-<p>افزودن تابع ارسال پیام تلگرامی</p>
+<p>افزودن اینترفیس ارسال پیام</p>
 </td>
 <td width="292">
-<p>افزودن یک تابع void با عنوان sendTelegramMessage</p>
+<p>افزودن یک تابع void با عنوان sendMessage</p>
 </td>
 </tr>
 
 <tr>
 <td width="64">
-<p><strong>&nbsp;</strong></p>
+<p><strong>۲</strong></p>
 </td>
 <td width="198">
-<p>&nbsp;</p>
+<p>TelegramService</p>
 </td>
 <td width="141">
-<p>&nbsp;</p>
+<p>ارث بری از MessageService</p>
 </td>
 <td width="292">
-<p>&nbsp;</p>
+<p> پیاده سازی تابع ارسال پیام برای سرویس تلگرام</p>
 </td>
 </tr>
 <tr>
 <td width="64">
-<p><strong>&nbsp;</strong></p>
+<p><strong>۳</strong></p>
 </td>
 <td width="198">
-<p>&nbsp;</p>
+<p>OnlineOrderService</p>
 </td>
 <td width="141">
-<p>&nbsp;</p>
+<p>اضافه کردن امکان پیام رسانی به اردر های آنلاین</p>
 </td>
 <td width="292">
-<p>&nbsp;</p>
+<p>اضافه کردن فیلد مسیجینگ به این کلاس</p>
 </td>
 </tr>
 <tr>
 <td width="64">
-<p><strong>&nbsp;</strong></p>
+<p><strong>۴</strong></p>
 </td>
 <td width="198">
-<p>&nbsp;</p>
+<p>OnSiteOrderService</p>
 </td>
 <td width="141">
-<p>&nbsp;</p>
+<p>اضافه کردن امکان پیام رسانی به اردر های حضوری</p>
 </td>
 <td width="292">
-<p>&nbsp;</p>
+<p>اضافه کردن فیلد مسیجینگ به این کلاس</p>
 </td>
 </tr>
+<tr>
+<td width="64">
+<p><strong>۵</strong></p>
+</td>
+<td width="198">
+<p>Main</p>
+</td>
+<td width="141">
+<p>
+اضافه کردن امکان پیام رسانی
+</p>
+</td>
+<td width="292">
+<p>
+اضافه کردن فیلد تلگرام مسیجینگ به بدنه تابع مین
+</p>
+</td>
+</tr>
+
 </tbody>
 </table>
 
 مجموع تعداد تغییرات: ..............
 
 ### گام ۲: تحلیل و وارسی برنامه از منظر تحقق و یا عدم تحقق اصول SOLID
-در خصوص این برنامه‌ای که نوشته شده بود و شما یک قابلیت به آن اضافه کردید، بر اساس اصول SOLID موارد نقض و یا محقق شدن هر کدام از آن اصول را بیان کنید. در بیان موارد تحقق و نقض، علت تحقق و یا نقض را نیز به صورت کامل توضیح دهید:
-
 <table dir='rtl'>
 <tbody>
 <tr>
@@ -99,7 +116,9 @@
 <p><strong>موارد تحقق</strong></p>
 </td>
 <td width="454">
-<p>&nbsp;</p>
+<p>
+کلاس‌های OnlineOrderService و OnSiteOrderService تنها وظیفه پردازش و ثبت سفارشات و همچنین پرداخت‌ها را بر عهده دارند. اما این کلاس‌ها از MessagingService نیز استفاده می‌کنند تا پیام‌ها را ارسال کنند.
+</p>
 </td>
 </tr>
 <tr>
@@ -107,7 +126,9 @@
 <p><strong>موارد نقض</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>
+با اضافه شدن ارسال پیام به این کلاس‌ها، اصل تک‌مسئولیتی نقض می‌شود، زیرا اکنون علاوه بر مدیریت سفارش، وظیفه ارسال پیام را نیز بر عهده دارند.
+</p>
 </td>
 </tr>
 <tr>
@@ -119,7 +140,9 @@
 <p><strong>موارد تحقق</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>
+با استفاده از اینترفیس MessagingService، می‌توانیم پیام‌رسان‌های دیگری مانند سرویس ایمیل را بدون نیاز به تغییر در کد موجود اضافه کنیم.
+</p>
 </td>
 </tr>
 <tr>
@@ -127,7 +150,9 @@
 <p><strong>موارد نقض</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>
+برای OrderService به دلیل نیاز به تغییر کد Main در صورت اضافه شدن پیام‌رسان‌های دیگر، هنوز OCP کامل نیست.
+</p>
 </td>
 </tr>
 <tr>
@@ -139,7 +164,9 @@
 <p><strong>موارد تحقق</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>
+کلاس TelegramService به درستی این اصل را رعایت می‌کند، زیرا می‌تواند به عنوان پیاده‌سازی MessagingService در همه جا به کار رود.
+</p>
 </td>
 </tr>
 <tr>
@@ -159,7 +186,8 @@
 <p><strong>موارد تحقق</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>
+MessagingService تنها یک متد sendMessage دارد و از اصل ISP تبعیت می‌کند.</p>
 </td>
 </tr>
 <tr>
@@ -179,7 +207,9 @@
 <p><strong>موارد تحقق</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>
+در این کد، کلاس‌های OrderService به جای وابستگی به TelegramService مستقیماً از MessagingService استفاده می‌کنند که به درستی DIP را رعایت کرده‌اند.
+</p>
 </td>
 </tr>
 <tr>
@@ -187,7 +217,7 @@
 <p><strong>موارد نقض</strong></p>
 </td>
 <td>
-<p>&nbsp;</p>
+<p>وابستگی به MessagingService به صورت دستی در Main ساخته شده و این می‌تواند در پروژه‌های بزرگ مشکل‌ساز شود.</p>
 </td>
 </tr>
 </tbody>
@@ -210,48 +240,38 @@
 </tr>
 <tr>
 <td width="168">
-<p>&nbsp;</p>
+<p>Single Responsibility</p>
 </td>
 <td width="246">
-<p>&nbsp;</p>
+<p>اکنون علاوه بر مدیریت سفارش، وظیفه ارسال پیام را نیز بر عهده دارند.</p>
 </td>
 <td width="284">
-<p>&nbsp;</p>
+<p>اضافه کردن کلاس OrderNotifier: این کلاس مسئول ارسال پیام‌ها می‌شود و از MessagingService استفاده می‌کند.</p>
 </td>
 </tr>
 <tr>
 <td width="168">
-<p>&nbsp;</p>
+<p>OCP</p>
 </td>
 <td width="246">
-<p>&nbsp;</p>
+<p>برای OrderService به دلیل نیاز به تغییر کد Main در صورت اضافه شدن پیام‌رسان‌های دیگر، هنوز OCP کامل نیست.</p>
 </td>
 <td width="284">
-<p>&nbsp;</p>
+<p>ایجاد OrderServiceFactory: این کلاس به ایجاد نمونه‌های OrderService و وابستگی‌های لازم آن‌ها کمک می‌کند و اصل وارونگی وابستگی و باز برای توسعه و بسته برای تغییر را تقویت می‌کند.</p>
 </td>
 </tr>
 <tr>
 <td width="168">
-<p>&nbsp;</p>
+<p>DIP</p>
 </td>
 <td width="246">
-<p>&nbsp;</p>
+<p>وابستگی به MessagingService به صورت دستی در Main ساخته شده و این می‌تواند در پروژه‌های بزرگ مشکل‌ساز شود.</p>
 </td>
 <td width="284">
-<p>&nbsp;</p>
+<p>استفاده از Dependency Injection که می‌تواند به بهبود مدیریت وابستگی ها منجر بشود.</p>
 </td>
 </tr>
-<tr>
-<td width="168">
-<p>&nbsp;</p>
-</td>
-<td width="246">
-<p>&nbsp;</p>
-</td>
-<td width="284">
-<p>&nbsp;</p>
-</td>
-</tr>
+
 </tbody>
 </table>
 
