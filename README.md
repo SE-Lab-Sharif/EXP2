@@ -280,8 +280,106 @@ MessagingService تنها یک متد sendMessage دارد و از اصل ISP ت
 
 ### گام ۴: بررسی مجدد تغییرات مورد نیاز
 فرض کنید که گام 1 را برای کد اصلاح شده (پس از انجام گام‌های ۲ و ۳) اجرا کرده‌اید.
+
+<lr>
 1. در این صورت از انجام کدام یک از تغییرات ثبت شده در جدول گام ۱ معاف خواهید شد؟
+</lr>
+
+فرض کنید می‌خواهیم مثل گام۱، یک نوع جدیدی از ارسال پیام را به برنامه اضافه کنیم. مثلا می‌خواهیم علاوه بر روش کنونی که اطلاع‌رسانی از طریق تلگرام است، از طریق email هم پیام ارسال کنیم. برای این‌کار باید چه تغییراتی اعمال شود؟ آنها را بررسی می‌کنیم:
+
+<ul>
+<li> نیازی به تغییر در کلاس‌های <code>OrderService</code> نداشتیم:
+
+فرض کنیم که اصلاحات فاز ۱ را انجام نداده بودیم. در اینصورت باید کلاس‌های <code>OrderService</code> را تغییر می‌دادیم زیرا سیستم پیام‌رسانی هم داخل این کلاس‌ها ا‌نجام می‌شد. اما حالا با انجام اصل <code>Single Responsibility</code> این سیستم توسط کلاس <code>OrderNotifier</code> انجام می‌شود. درنتیجه نیازی به تغییر کلاس‌های <code>OnlineOrderService</code> و <code>OnSireOrderService</code> نیست. (و حتی هر روش Order ی که بعدا اضافه شود و اینترفیس <code>OrderService</code> را implement کند.) فقط و فقط کافی‌ست که کلاس مربوط به email را در پکیج <code>MessagingServices</code> پیاده سازی کنیم. مثلا، کافی‌ست یک کلاس <code>EmailingService</code> بصورت زیر بسازیم.
+
+</li>
+
+```java
+package MessagingServices;
+
+public class EmailingService implements MessagingService {
+
+    @Override
+    public void sendMessage(String message) {
+        System.out.println("Sending message via Email: " + message);
+    }
+}
+```
+
+اما اگر این تغییرات را نداده بودیم و مثلا می‌خواستیم که notification هم از طریق تلگرام و هم از طریق ایمیل برای شخص ارسال شود (یعنی از ۲ طریق) باید کدهای درون کلاس‌هایی که اینترفیس <code>OrderService</code> را پیاده می‌کردند، تغییر می‌دادیم. مثلا باید چنین کدی می‌نوشتیم (بصورت reduntant درکلاس‌های مختلف OrderService):
+
+```java
+package PaymentServices;
+import MessagingServices.MessagingService;
+
+public class OnlineOrderService implements OrderService {
+    private MessagingService messagingServiceOne;
+    private MessagingService messagingServiceTwo;
+
+    public OnlineOrderService(MessagingService messagingServiceOne, MessagingService messagingServiceTwo) {
+        this.messagingServiceOne = messagingServiceOne;
+
+        this.messagingServiceTwo = messagingServiceTwo;
+    }
+
+    @Override
+    public void onSiteOrderRegister(String customerName) {
+        //Empty Body!
+    }
+
+    @Override
+    public void onlineOrderRegister(String customerName) {
+        System.out.println("online order registered for " + customerName);
+        messagingServiceOne.sendMessage("Order registered for " + customerName);
+        messagingServiceTwo.sendMessage("Order registered for " + customerName);
+    }
+
+    @Override
+    public void onSiteOrderPayment(int foodPrice) {
+        //Empty Body
+    }
+
+    @Override
+    public void onlineOrderPayment(int foodPrice) {
+        System.out.println("online Payment with Price : " + foodPrice + " Tomans!");
+        messagingServiceOne.sendMessage("Payment completed for " + foodPrice + " Tomans!");
+        messagingServiceTwo.sendMessage("Payment completed for " + foodPrice + " Tomans!");
+    }
+}
+```
+
+<li> نیازی به تغیر در <code>OrderNotifier</code> نیست:
+
+ما <code>OrderNotifier</code> را طوری نوشته‌ایم که برای اضافه کردن یک سرویس ارتباطی جدید، نیازی به تغییر در آن نیست و با همه‌ی انواع <code>MessaginService</code> کار می‌کند. مثلا برای افزودن راه ارتباطی "ارسال پیام از طریق Whatsapp" کافی‌است که کلاس زیر را تعریف کنیم:
+</li>
+
+```java
+package MessagingServices;
+
+public class WhatsappService implements MessagingService {
+
+    @Override
+    public void sendMessage(String message) {
+        System.out.println("Sending message via Whatsapp: " + message);
+    }
+}
+```
+<li> نیازی به تغییر در کد <code>Main</code> نیست:
+
+از آنجا که از <code>OrderServiceFactory</code> در جهت ایجاد و تزریق نوع پیامرسانی استفاده می‌کنیم، دیگر نیازی به تغییر کد Main نداریم. فقط کافی است تا نوع سرویس جدید خود را بعنوان نوع پیام‌رسانی وارد کنیم.
+</li>
+</ul>
+
+<lr>
 2. تعداد تغییرات مورد نیاز، چند تغییر خواهد شد؟
+</lr>
+
+بیایید مجددا کیس افزودن راه ارتباطی ایمیل را درنظر بگیریم. در این کیس همانطور که در بالا توضیح داده شد، یک کلاس `EmailService` لازم داریم که اینترفیس `MessagingService` را implement کند. پیاده‌سازی نمونه‌ی این کلاس را در بالا نوشته‌ایم و می‌توانید مشاهده کنید.
+
+در ادامه، اگر بخواهیم که در `Main` یا هرکجای دیگر برنامه از این نوع سرویس استفاده کنیم، کافی‌است که `EmailService` را به عنوان نوع `MessagingService` به `OrderServiceFactory` یا `OrderNotifier` وارد کنیم.
+
+با این توضیحات، همین ۲ تغییر برای اضافه کردن این قابلیت کافی است.
+
 
 ### گام ۵: جمع بندی
 در این بخش، بیان کنید که از این گام چه نتیجه‌ای گرفته‌اید؟ و به نظر شما به کارگیری صحیح اصول SOLID در گام‌های ۳ و ۴ چه مزایایی را نسبت به حالتی دارد که این اصول رعایت نشده‌بود؟
