@@ -1,6 +1,5 @@
-import PaymentServices.OnSiteOrderService;
-import PaymentServices.OnlineOrderService;
 import PaymentServices.OrderService;
+import PaymentServices.OrderServiceFactory;
 import MessagingServices.TelegramService;
 import MessagingServices.MessagingService;
 
@@ -11,7 +10,6 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         MessagingService messagingService = new TelegramService();
-        OrderService orderService = null;
         String customerName;
         Order order;
         int customerAnswerForOrder = 0;
@@ -36,21 +34,24 @@ public class Main {
 
         System.out.println("Enter Your Payment Method (1 for online and 2 for on-site):");
         customerAnswerForPaymentMethod = scanner.nextInt();
+        OrderService orderService = null;
+
         if (customerAnswerForPaymentMethod == 1) {
-            orderService = new OnlineOrderService(messagingService);
+            orderService = OrderServiceFactory.createOrderService("online", messagingService);
             orderService.onlineOrderRegister(customerName);
         } else if (customerAnswerForPaymentMethod == 2) {
-            orderService = new OnSiteOrderService(messagingService);
+            orderService = OrderServiceFactory.createOrderService("onsite", messagingService);
             orderService.onSiteOrderRegister(customerName);
         }
 
         System.out.println("Pay Price:");
-        if (orderService instanceof OnlineOrderService) {
-            orderService.onlineOrderPayment(order.getTotalPrice());
-        } else if (orderService instanceof OnSiteOrderService) {
-            orderService.onSiteOrderPayment(order.getTotalPrice());
+        if (orderService != null) {
+            if (orderService instanceof OnlineOrderService) {
+                orderService.onlineOrderPayment(order.getTotalPrice());
+            } else if (orderService instanceof OnSiteOrderService) {
+                orderService.onSiteOrderPayment(order.getTotalPrice());
+            }
         }
-
         System.out.println(order);
     }
 }
