@@ -1,33 +1,33 @@
 package PaymentServices;
 
-import MessagingServices.MessagingService;
+import NotificationServices.OrderNotifier;
 
 public class OnSiteOrderService implements OrderService {
-    private MessagingService messagingService;
+    private final OrderNotifier notifier;
 
-    public OnSiteOrderService(MessagingService messagingService) {
-        this.messagingService = messagingService;
+    public OnSiteOrderService(OrderNotifier notifier) {
+        this.notifier = notifier;
     }
 
     @Override
     public void onSiteOrderRegister(String customerName) {
         System.out.println("on-Site order registered for " + customerName);
-        messagingService.sendMessage("On-site order registered for " + customerName);
+        notifier.notify("On-site order registered for " + customerName);
     }
 
     @Override
     public void onlineOrderRegister(String customerName) {
-        //Empty Body
+        // Empty Body
     }
 
     @Override
     public void onSiteOrderPayment(int foodPrice) {
         System.out.println("on-Site Payment with Price : " + foodPrice + " Tomans!");
-        messagingService.sendMessage("On-site payment completed for " + foodPrice + " Tomans!");
+        notifier.notify("On-site payment completed for " + foodPrice + " Tomans!");
     }
 
     @Override
     public void onlineOrderPayment(int foodPrice) {
-        //Empty Body
+        // Empty Body
     }
 }
